@@ -1,0 +1,11 @@
+CREATE OR REPLACE TRIGGER trc_sql
+AFTER logon ON DATABASE
+BEGIN
+  IF ora_login_user LIKE 'KYCGLBL%' THEN
+    EXECUTE IMMEDIATE 'ALTER SESSION SET tracefile_identifier = ''KYC''';
+    EXECUTE IMMEDIATE 'ALTER SESSION SET EVENTS ''10046 trace name context forever, level 12''';
+  END IF;
+END;
+/
+GRANT ALTER SESSION TO SYSTEM;
+

@@ -1,0 +1,1 @@
+rman target=sys/man@kozyr @bak.rman

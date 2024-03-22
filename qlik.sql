@@ -1,0 +1,1 @@
+conn qlik/view@kt1
