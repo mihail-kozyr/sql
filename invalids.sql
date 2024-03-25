@@ -1,3 +1,8 @@
+col owner for a20
+col object_name for a60
+set linesize 200
+set trimspool on
+
 SELECT owner, object_type, COUNT(*) invalids_cnt
     FROM dba_objects
   WHERE status = 'INVALID'
