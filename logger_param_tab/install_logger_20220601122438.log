@@ -1,0 +1,82 @@
+SQL> 
+SQL> PROMPT *************************************************************************
+*************************************************************************
+SQL> 
+SQL> PROMPT  *  Logger Installation (&today)
+*  Logger Installation (01.06.2022 12:24:38)
+SQL> 
+SQL> PROMPT *************************************************************************
+*************************************************************************
+SQL> REM @@SEQ.sql
+SQL> @@LOG.sql
+SQL> WHENEVER SQLERROR EXIT FAILURE;
+SQL> --------------------------------------------------------
+SQL> --  DDL for Table LOG
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   CREATE TABLE "LOG" 
+  2     (	"ID" NUMBER GENERATED ALWAYS AS IDENTITY, 
+  3  	"LOG_DATE" DATE DEFAULT SYSDATE, 
+  4  	"TASK_CODE" VARCHAR2(128 CHAR), 
+  5  	"LOG_LEVEL" VARCHAR2(30 CHAR), 
+  6  	"MESSAGE" VARCHAR2(4000 CHAR), 
+  7  	"ERROR_CODE" VARCHAR2(256 CHAR), 
+  8  	"PROCEDURE_NAME" VARCHAR2(240 CHAR), 
+  9  	"ERROR_LINE" NUMBER, 
+ 10  	"NOTE" VARCHAR2(4000 CHAR), 
+ 11  	"MODIFIED_ON" DATE DEFAULT SYSDATE, 
+ 12  	"MODIFIED_BY" VARCHAR2(30 CHAR) DEFAULT USER, 
+ 13  	"OSUSER" VARCHAR2(30 CHAR) DEFAULT sys_context('USERENV','OS_USER'), 
+ 14  	"HOST" VARCHAR2(54 CHAR) DEFAULT sys_context('USERENV','HOST'), 
+ 15  	"IP" VARCHAR2(30 CHAR) DEFAULT sys_context('USERENV','IP_ADDRESS'), 
+ 16  	"CLIENT_IDENTIFIER" VARCHAR2(64 CHAR) DEFAULT sys_context('USERENV','CLIENT_IDENTIFIER'), 
+ 17  	"CALL_STACK" VARCHAR2(4000 CHAR), 
+ 18  	"SESSIONID" VARCHAR2(200 CHAR) DEFAULT sys_context('USERENV','SESSIONID'), 
+ 19  	"SID" NUMBER DEFAULT to_number(sys_context('USERENV','SID') ), 
+ 20  	"ACTION" VARCHAR2(32 CHAR) DEFAULT sys_context('USERENV','ACTION'), 
+ 21  	"BG_JOB_ID" VARCHAR2(64 CHAR) DEFAULT sys_context('USERENV','BG_JOB_ID'), 
+ 22  	"MODULE" VARCHAR2(48 CHAR) DEFAULT sys_context('USERENV','MODULE'), 
+ 23  	"STATEMENTID" NUMBER DEFAULT to_number(sys_context('USERENV','STATEMENTID') ), 
+ 24  	"ERROR_BACKTRACE" VARCHAR2(4000 CHAR), 
+ 25  	"LONG_MESSAGE" CLOB,
+ 26      "TABLE_NAME" VARCHAR2(128 BYTE)	
+ 27     ) ;
+
+Error starting at line : 6 File @ C:\MiKo\Work\logger_param_tab\LOG.sql
+In command -
+  CREATE TABLE "LOG" 
+   (	"ID" NUMBER GENERATED ALWAYS AS IDENTITY, 
+	"LOG_DATE" DATE DEFAULT SYSDATE, 
+	"TASK_CODE" VARCHAR2(128 CHAR), 
+	"LOG_LEVEL" VARCHAR2(30 CHAR), 
+	"MESSAGE" VARCHAR2(4000 CHAR), 
+	"ERROR_CODE" VARCHAR2(256 CHAR), 
+	"PROCEDURE_NAME" VARCHAR2(240 CHAR), 
+	"ERROR_LINE" NUMBER, 
+	"NOTE" VARCHAR2(4000 CHAR), 
+	"MODIFIED_ON" DATE DEFAULT SYSDATE, 
+	"MODIFIED_BY" VARCHAR2(30 CHAR) DEFAULT USER, 
+	"OSUSER" VARCHAR2(30 CHAR) DEFAULT sys_context('USERENV','OS_USER'), 
+	"HOST" VARCHAR2(54 CHAR) DEFAULT sys_context('USERENV','HOST'), 
+	"IP" VARCHAR2(30 CHAR) DEFAULT sys_context('USERENV','IP_ADDRESS'), 
+	"CLIENT_IDENTIFIER" VARCHAR2(64 CHAR) DEFAULT sys_context('USERENV','CLIENT_IDENTIFIER'), 
+	"CALL_STACK" VARCHAR2(4000 CHAR), 
+	"SESSIONID" VARCHAR2(200 CHAR) DEFAULT sys_context('USERENV','SESSIONID'), 
+	"SID" NUMBER DEFAULT to_number(sys_context('USERENV','SID') ), 
+	"ACTION" VARCHAR2(32 CHAR) DEFAULT sys_context('USERENV','ACTION'), 
+	"BG_JOB_ID" VARCHAR2(64 CHAR) DEFAULT sys_context('USERENV','BG_JOB_ID'), 
+	"MODULE" VARCHAR2(48 CHAR) DEFAULT sys_context('USERENV','MODULE'), 
+	"STATEMENTID" NUMBER DEFAULT to_number(sys_context('USERENV','STATEMENTID') ), 
+	"ERROR_BACKTRACE" VARCHAR2(4000 CHAR), 
+	"LONG_MESSAGE" CLOB,
+    "TABLE_NAME" VARCHAR2(128 BYTE)	
+   )
+Error report -
+ORA-00406: параметр COMPATIBLE должен быть 12.0.0.0.0 или больше
+ORA-00722: Функция "SQL identity columns"
+00406. 00000 -  "COMPATIBLE parameter needs to be %s or greater"
+*Cause:    The COMPATIBLE initialization parameter is not high
+           enough to allow the operation. Allowing the command would make
+           the database incompatible with the release specified by the
+           current COMPATIBLE parameter.
+*Action:   Shutdown and startup with a higher compatibility setting.

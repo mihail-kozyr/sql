@@ -1,0 +1,801 @@
+SQL> 
+SQL> PROMPT *************************************************************************
+*************************************************************************
+SQL> 
+SQL> PROMPT  *	Logger Installation (&today)
+*  Logger Installation (20.04.2023 15:41:02)
+SQL> 
+SQL> PROMPT *************************************************************************
+*************************************************************************
+SQL> rem @@SEQ.sql
+SQL> rem@@LOG_NOIDENTITY.sql
+SQL> @@LOG.sql
+SQL> WHENEVER SQLERROR EXIT FAILURE;
+SQL> --------------------------------------------------------
+SQL> --  DDL for Table LOG
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   CREATE TABLE "LOG"
+  2  	(    "ID" NUMBER GENERATED ALWAYS AS IDENTITY,
+  3  	     "LOG_DATE" DATE DEFAULT SYSDATE,
+  4  	     "TASK_CODE" VARCHAR2(128 CHAR),
+  5  	     "LOG_LEVEL" VARCHAR2(30 CHAR),
+  6  	     "MESSAGE" VARCHAR2(4000 CHAR),
+  7  	     "ERROR_CODE" VARCHAR2(256 CHAR),
+  8  	     "PROCEDURE_NAME" VARCHAR2(240 CHAR),
+  9  	     "ERROR_LINE" NUMBER,
+ 10  	     "NOTE" VARCHAR2(4000 CHAR),
+ 11  	     "MODIFIED_ON" DATE DEFAULT SYSDATE,
+ 12  	     "MODIFIED_BY" VARCHAR2(30 CHAR) DEFAULT USER,
+ 13  	     "OSUSER" VARCHAR2(30 CHAR) DEFAULT sys_context('USERENV','OS_USER'),
+ 14  	     "HOST" VARCHAR2(54 CHAR) DEFAULT sys_context('USERENV','HOST'),
+ 15  	     "IP" VARCHAR2(30 CHAR) DEFAULT sys_context('USERENV','IP_ADDRESS'),
+ 16  	     "CLIENT_IDENTIFIER" VARCHAR2(64 CHAR) DEFAULT sys_context('USERENV','CLIENT_IDENTIFIER'),
+ 17  	     "CALL_STACK" VARCHAR2(4000 CHAR),
+ 18  	     "SESSIONID" VARCHAR2(200 CHAR) DEFAULT sys_context('USERENV','SESSIONID'),
+ 19  	     "SID" NUMBER DEFAULT to_number(sys_context('USERENV','SID') ),
+ 20  	     "ACTION" VARCHAR2(32 CHAR) DEFAULT sys_context('USERENV','ACTION'),
+ 21  	     "BG_JOB_ID" VARCHAR2(64 CHAR) DEFAULT sys_context('USERENV','BG_JOB_ID'),
+ 22  	     "MODULE" VARCHAR2(48 CHAR) DEFAULT sys_context('USERENV','MODULE'),
+ 23  	     "STATEMENTID" NUMBER DEFAULT to_number(sys_context('USERENV','STATEMENTID') ),
+ 24  	     "ERROR_BACKTRACE" VARCHAR2(4000 CHAR),
+ 25  	     "LONG_MESSAGE" CLOB,
+ 26  	 "TABLE_NAME" VARCHAR2(128 BYTE)
+ 27  	) ;
+
+Table created.
+
+SQL> 
+SQL> 
+SQL> 	COMMENT ON COLUMN "LOG"."ID" IS 'Суррогатный ключ';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."LOG_DATE" IS 'Дата события';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."TASK_CODE" IS 'Код задачи';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."LOG_LEVEL" IS 'Уровень логирования: CRITICAL, ERROR, WARNING, INFO, DEBUG';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."MESSAGE" IS 'Текст сообщения';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."ERROR_CODE" IS 'Код ошибки или предупреждения';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."PROCEDURE_NAME" IS 'Название программного модуля';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."ERROR_LINE" IS 'Строка ошибки в программном модуле';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."NOTE" IS 'Комментарий';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."MODIFIED_ON" IS 'Дата вставки/изменения записи';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."MODIFIED_BY" IS 'Автор вставки/изменения';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."OSUSER" IS 'Пользователь ОС';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."HOST" IS 'Имя хоста';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."IP" IS 'IP адрес';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."CLIENT_IDENTIFIER" IS 'Возвращает идентификатор приложения, установленный через DBMS_SESSION.SET_IDENTIFIER, через трибут OCI OCI_ATTR_CLIENT_IDENTIFIER или Java класс Oracle.jdbc.OracleConnection.setClientIdentifier';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."CALL_STACK" IS 'Полный стек вызовов';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."SESSIONID" IS 'Идентификатор сеанса';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."SID" IS 'SID сеанса';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."ACTION" IS 'Имя приложения, установленное через пакет DBMS_APPLICATION_INFO или OCI';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."BG_JOB_ID" IS 'Идентификатор фонового процесса oracle';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."MODULE" IS 'Модуль, установленный через пакет DBMS_APPLICATION_INFO или OCI';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."STATEMENTID" IS 'Идентификатор аудируемого через стандартный или fine-grained аудит оператора - STATEMENTID';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."ERROR_BACKTRACE" IS 'Стек вызова с указанием номера строки, в котором произошло исключение';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG"."LONG_MESSAGE" IS 'Поле для сообщений, превышающих 4000 байт';
+
+Comment created.
+
+SQL> 	COMMENT ON TABLE "LOG"	IS 'Таблица журналирования';
+
+Comment created.
+
+SQL> @@LOG_CONSTRAINT.sql
+SQL> --------------------------------------------------------
+SQL> --  Constraints for Table LOG
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   ALTER TABLE "LOG" ADD CONSTRAINT "LOG_PK" PRIMARY KEY ("ID")
+  2    USING INDEX  ENABLE;
+
+Table altered.
+
+SQL> @@LOG_DATE_IDX.sql
+SQL> --------------------------------------------------------
+SQL> --  DDL for Index LOG_DATE_IDX
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   CREATE INDEX "LOG_DATE_IDX" ON "LOG" ("LOG_DATE")
+  2    ;
+
+Index created.
+
+SQL> @@LOG_LEVEL.sql
+SQL> --------------------------------------------------------
+SQL> --  DDL for Table LOG_LEVEL
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   CREATE TABLE "LOG_LEVEL"
+  2  	(    "LOG_LEVEL" VARCHAR2(20),
+  3  	     "LOG_LEVEL_NO" VARCHAR2(20 CHAR),
+  4  	     "CREATED_BY" VARCHAR2(512 CHAR) DEFAULT COALESCE(sys_context('APEX$SESSION', 'APP_USER'), SYS_CONTEXT('CLIENTCONTEXT', 'apex_user_name'), USER),
+  5  	     "CREATED_ON" DATE DEFAULT SYSDATE,
+  6  	     "MODIFIED_BY" VARCHAR2(512 CHAR),
+  7  	     "MODIFIED_ON" DATE,
+  8  	     "LOV_LEVEL_NAME" VARCHAR2(50)
+  9  	) ;
+
+Table created.
+
+SQL> 
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."LOG_LEVEL" IS 'Уровень логирования';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."LOG_LEVEL_NO" IS 'Числовое значение уровня логирования';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."CREATED_BY" IS 'Автор создания записи';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."CREATED_ON" IS 'Дата создания записи';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."MODIFIED_BY" IS 'Автор изменения записи';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."MODIFIED_ON" IS 'Дата изменения записи';
+
+Comment created.
+
+SQL> 	COMMENT ON COLUMN "LOG_LEVEL"."LOV_LEVEL_NAME" IS 'Название уровня логирования на русском';
+
+Comment created.
+
+SQL> 	COMMENT ON TABLE "LOG_LEVEL"  IS 'Уровни логирования для записи в журнал событий (LOG). Используется для регулирования количества записей, записываемых в журнал';
+
+Comment created.
+
+SQL> @@LOG_LEVEL_CONSTRAINT.sql
+SQL> --------------------------------------------------------
+SQL> --  Constraints for Table LOG_LEVEL
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   ALTER TABLE "LOG_LEVEL" MODIFY ("LOG_LEVEL" NOT NULL ENABLE);
+
+Table altered.
+
+SQL>   ALTER TABLE "LOG_LEVEL" ADD CONSTRAINT "LOG_LEVEL_PK" PRIMARY KEY ("LOG_LEVEL")
+  2    USING INDEX  ENABLE;
+
+Table altered.
+
+SQL> @@LOG_LEVEL_DATA_TABLE.sql
+SQL> REM INSERTING into LOG_LEVEL
+SQL> SET DEFINE OFF;
+SQL> Insert into LOG_LEVEL (LOG_LEVEL,LOG_LEVEL_NO,CREATED_BY,CREATED_ON,MODIFIED_BY,MODIFIED_ON,LOV_LEVEL_NAME) values ('CRITICAL','50','FFA_CTL',to_date('26.03.20','DD.MM.RR'),'FFA_CTL',to_date('19.02.21','DD.MM.RR'),'Критический');
+
+1 row created.
+
+SQL> Insert into LOG_LEVEL (LOG_LEVEL,LOG_LEVEL_NO,CREATED_BY,CREATED_ON,MODIFIED_BY,MODIFIED_ON,LOV_LEVEL_NAME) values ('ERROR','40','FFA_CTL',to_date('26.03.20','DD.MM.RR'),'FFA_CTL',to_date('19.02.21','DD.MM.RR'),'Ошибка');
+
+1 row created.
+
+SQL> Insert into LOG_LEVEL (LOG_LEVEL,LOG_LEVEL_NO,CREATED_BY,CREATED_ON,MODIFIED_BY,MODIFIED_ON,LOV_LEVEL_NAME) values ('WARNING','30','FFA_CTL',to_date('26.03.20','DD.MM.RR'),'FFA_CTL',to_date('19.02.21','DD.MM.RR'),'Предупреждение');
+
+1 row created.
+
+SQL> Insert into LOG_LEVEL (LOG_LEVEL,LOG_LEVEL_NO,CREATED_BY,CREATED_ON,MODIFIED_BY,MODIFIED_ON,LOV_LEVEL_NAME) values ('INFO','20','FFA_CTL',to_date('26.03.20','DD.MM.RR'),'FFA_CTL',to_date('19.02.21','DD.MM.RR'),'Инфо');
+
+1 row created.
+
+SQL> Insert into LOG_LEVEL (LOG_LEVEL,LOG_LEVEL_NO,CREATED_BY,CREATED_ON,MODIFIED_BY,MODIFIED_ON,LOV_LEVEL_NAME) values ('DEBUG','10','FFA_CTL',to_date('26.03.20','DD.MM.RR'),'FFA_CTL',to_date('19.02.21','DD.MM.RR'),'Отладка');
+
+1 row created.
+
+SQL> @@PARAMS.sql
+SQL> --------------------------------------------------------
+SQL> --  DDL for Table PARAMS
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   CREATE TABLE "PARAMS"
+  2  	(    "PARAM" VARCHAR2(512 CHAR),
+  3  	     "VAL" VARCHAR2(4000 CHAR),
+  4  	     "DESCRIPTION" VARCHAR2(4000 CHAR),
+  5  	     "CREATED_ON" DATE DEFAULT SYSDATE,
+  6  	     "CREATED_BY" VARCHAR2(512 CHAR) DEFAULT sys_context('USERENV','OS_USER'),
+  7  	     "MODIFIED_ON" DATE DEFAULT sysdate,
+  8  	     "MODIFIED_BY" VARCHAR2(512 CHAR)
+  9  	) ;
+
+Table created.
+
+SQL> @@PARAMS_CONSTRAINT.sql
+SQL> --------------------------------------------------------
+SQL> --  Constraints for Table PARAMS
+SQL> --------------------------------------------------------
+SQL> 
+SQL>   ALTER TABLE "PARAMS" ADD CONSTRAINT "PARAM_PK" PRIMARY KEY ("PARAM")
+  2    USING INDEX  ENABLE;
+
+Table altered.
+
+SQL> @@PARAMS_DATA_TABLE.sql
+SQL> REM INSERTING into PARAMS
+SQL> SET DEFINE OFF;
+SQL> Insert into PARAMS (PARAM,VAL,DESCRIPTION,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('EXPORT_DIRECTORY','REP','Директория Oracle для экспорта реплицируемых таблиц через DataPump',to_date('11.01.22','DD.MM.RR'),'u_m1d9g',to_date('11.01.22','DD.MM.RR'),null);
+
+1 row created.
+
+SQL> Insert into PARAMS (PARAM,VAL,DESCRIPTION,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('LOG_LEVEL','DEBUG','Уровень журналирования - DEBUG, INFO, ERROR,CRITICAL',to_date('13.01.22','DD.MM.RR'),'u_m1d9g',to_date('13.01.22','DD.MM.RR'),null);
+
+1 row created.
+
+SQL> @@logger.pls
+SQL> create or replace TYPE LOGGER force AS OBJECT(
+  2  
+  3  /**
+  4   * Объект для журналирования действий в системе
+  5   * Для журналирования событий в приложении используется таблица журналов
+  6   * LOG. В данную таблицу рекомендуется помещать все события
+  7   * системы, логика которых реализована в базе данных, PL/SQL, Java
+  8   *
+  9   * @headcom
+ 10   */
+ 11  
+ 12  
+ 13  	 -- свойства логера
+ 14  	 id NUMBER, -- идентификатор записи логгера
+ 15  	 task_code VARCHAR2(30 CHAR), -- код задачи
+ 16  	 log_level VARCHAR2(8), -- CRITICAL, ERROR, WARNING, INFO, DEBUG
+ 17  	 level_no NUMBER, -- уровень журналирования в числовом представлении
+ 18  	 table_name VARCHAR2(128), -- имя таблицы
+ 19  
+ 20  
+ 21  	/** Конструктор для инициализации логгера
+ 22  	 *
+ 23  	 * @param p_task_code -  код задачи
+ 24  	 * @param p_table_name -  имя таблицы
+ 25  	 */
+ 26  	 CONSTRUCTOR FUNCTION LOGGER(
+ 27  	   SELF IN OUT NOCOPY LOGGER,
+ 28  	   p_task_code IN VARCHAR2 DEFAULT NULL,
+ 29  	   p_table_name IN VARCHAR2 DEFAULT NULL
+ 30  	 ) RETURN SELF AS RESULT,
+ 31  
+ 32    /** Метод вставки критического сообщения
+ 33  	 * @param p_message - текст сообщения
+ 34  	 * @param p_code - код критической ошибки
+ 35  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+ 36  	 * @param p_error_line - номер строки с ошибкой
+ 37  	 * @param p_note - примечание
+ 38  	 * @param p_error_backtrace - стэк сообщения об ошибке
+ 39  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+ 40  	 * @param p_table_name -  имя таблицы
+ 41  	 */
+ 42  	 MEMBER PROCEDURE critical(
+ 43  	   p_message VARCHAR2 DEFAULT NULL,
+ 44  	   p_code VARCHAR2 DEFAULT NULL,
+ 45  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+ 46  	   p_error_line VARCHAR2 DEFAULT NULL,
+ 47  	   p_note VARCHAR2 DEFAULT NULL,
+ 48  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+ 49  	   p_long_message IN CLOB DEFAULT NULL,
+ 50  	   p_table_name IN VARCHAR2 DEFAULT NULL
+ 51  	  ),
+ 52  
+ 53  
+ 54    /** Метод вставки сообщения об ошибке
+ 55  	 * @param p_message - текст сообщения
+ 56  	 * @param p_code - код критической ошибки
+ 57  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+ 58  	 * @param p_error_line - номер строки с ошибкой
+ 59  	 * @param p_note - примечание
+ 60  	 * @param p_error_backtrace - стэк сообщения об ошибке
+ 61  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+ 62  	 * @param p_table_name -  имя таблицы
+ 63  	 */
+ 64  	 MEMBER PROCEDURE error(
+ 65  	   p_message VARCHAR2 DEFAULT NULL,
+ 66  	   p_code VARCHAR2 DEFAULT NULL,
+ 67  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+ 68  	   p_error_line VARCHAR2 DEFAULT NULL,
+ 69  	   p_note VARCHAR2 DEFAULT NULL,
+ 70  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+ 71  	   p_long_message IN CLOB DEFAULT NULL,
+ 72  	   p_table_name IN VARCHAR2 DEFAULT NULL
+ 73  	   ),
+ 74  
+ 75  
+ 76  
+ 77    /** Метод вставки предупреждения
+ 78  	 * @param p_message - текст сообщения
+ 79  	 * @param p_code - код критической ошибки
+ 80  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+ 81  	 * @param p_error_line - номер строки с ошибкой
+ 82  	 * @param p_note - примечание
+ 83  	 * @param p_error_backtrace - стэк сообщения об ошибке
+ 84  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+ 85  	 * @param p_table_name -  имя таблицы
+ 86  	 */
+ 87  	 MEMBER PROCEDURE warning(
+ 88  	   p_message VARCHAR2 DEFAULT NULL,
+ 89  	   p_code VARCHAR2 DEFAULT NULL,
+ 90  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+ 91  	   p_error_line VARCHAR2 DEFAULT NULL,
+ 92  	   p_note VARCHAR2 DEFAULT NULL,
+ 93  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+ 94  	   p_long_message IN CLOB DEFAULT NULL,
+ 95  	   p_table_name IN VARCHAR2 DEFAULT NULL
+ 96  	  ),
+ 97  
+ 98  
+ 99  
+100    /** Метод вставки информациионного сообщения
+101  	 * @param p_message - текст сообщения
+102  	 * @param p_code - код критической ошибки
+103  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+104  	 * @param p_error_line - номер строки с ошибкой
+105  	 * @param p_note - примечание
+106  	 * @param p_error_backtrace - стэк сообщения об ошибке
+107  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+108  	 * @param p_table_name -  имя таблицы
+109  	 */
+110  	 MEMBER PROCEDURE info(
+111  	   p_message VARCHAR2 DEFAULT NULL,
+112  	   p_code VARCHAR2 DEFAULT NULL,
+113  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+114  	   p_error_line VARCHAR2 DEFAULT NULL,
+115  	   p_note VARCHAR2 DEFAULT NULL,
+116  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+117  	   p_long_message IN CLOB DEFAULT NULL,
+118  	   p_table_name IN VARCHAR2 DEFAULT NULL
+119  	  ),
+120  
+121  
+122  	/* Метод вставки сообщения для отладки
+123  	 * @param p_message - текст сообщения
+124  	 * @param p_code - код критической ошибки
+125  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+126  	 * @param p_error_line - номер строки с ошибкой
+127  	 * @param p_note - примечание
+128  	 * @param p_error_backtrace - стэк сообщения об ошибке
+129  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+130  	 * @param p_table_name -  имя таблицы
+131  	 */
+132  	 MEMBER PROCEDURE debug(
+133  	   p_message VARCHAR2 DEFAULT NULL,
+134  	   p_code VARCHAR2 DEFAULT NULL,
+135  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+136  	   p_error_line VARCHAR2 DEFAULT NULL,
+137  	   p_note VARCHAR2 DEFAULT NULL,
+138  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+139  	   p_long_message IN CLOB DEFAULT NULL,
+140  	   p_table_name IN VARCHAR2 DEFAULT NULL
+141  	  )
+142  
+143  
+144  ) NOT FINAL;
+145  /
+
+Type created.
+
+SQL> @@logger.plb
+SQL> create or replace TYPE BODY LOGGER AS
+  2  /**
+  3   * Объект для журналирования действий в системе
+  4   * Для журналирования событий в приложении используется таблица журналов
+  5   * LOG. В данную таблицу рекомендуется помещать все события
+  6   * системы, логика которых реализована в базе данных, PL/SQL, Java
+  7   *
+  8   * @headcom
+  9   *
+ 10   */
+ 11  
+ 12  
+ 13  	/** Конструктор для инициализации логгера
+ 14  	 *
+ 15  	 * @param p_task_code -  код задачи
+ 16  	 * @param p_table_name -  имя таблицы
+ 17  	 */
+ 18  
+ 19  	 CONSTRUCTOR FUNCTION LOGGER(
+ 20  	   SELF IN OUT NOCOPY LOGGER,
+ 21  	   p_task_code IN VARCHAR2 DEFAULT NULL,
+ 22  	   p_table_name IN VARCHAR2 DEFAULT NULL
+ 23  	 ) RETURN SELF AS RESULT
+ 24  	 IS
+ 25  	 BEGIN
+ 26  	     --self.id := log_seq.nextval;
+ 27  	     self.task_code := p_task_code;
+ 28  	     self.table_name := p_table_name;
+ 29  	     SELECT NVL(MAX(UPPER(val)), 'DEBUG') INTO self.log_level FROM params WHERE param = 'LOG_LEVEL';
+ 30  	     SELECT log_level_no INTO self.level_no FROM log_level WHERE log_level = self.log_level;
+ 31  	     RETURN;
+ 32  	 END LOGGER;
+ 33  
+ 34  
+ 35  	/* Метод вставки критического сообщения
+ 36  	 * @param p_message - текст сообщения
+ 37  	 * @param p_code - код критической ошибки
+ 38  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+ 39  	 * @param p_error_line - номер строки с ошибкой
+ 40  	 * @param p_note - примечание
+ 41  	 * @param p_error_backtrace - стэк сообщения об ошибке
+ 42  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+ 43  	 */
+ 44  	 MEMBER PROCEDURE critical(
+ 45  	   p_message VARCHAR2 DEFAULT NULL,
+ 46  	   p_code VARCHAR2 DEFAULT NULL,
+ 47  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+ 48  	   p_error_line VARCHAR2 DEFAULT NULL,
+ 49  	   p_note VARCHAR2 DEFAULT NULL,
+ 50  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+ 51  	   p_long_message IN CLOB DEFAULT NULL,
+ 52  	   p_table_name IN VARCHAR2 DEFAULT NULL
+ 53  	  )
+ 54  	 IS
+ 55  	     -- Обрезаем сообщение до первых 4К байт
+ 56  	     msg VARCHAR2(4000) := SUBSTRB(p_message, 1, 4000);
+ 57  	     large_msg CLOB;
+ 58  	     PRAGMA AUTONOMOUS_TRANSACTION;
+ 59  	 BEGIN
+ 60  
+ 61  	     IF self.level_no <= 50 THEN
+ 62  		 DBMS_OUTPUT.PUT_LINE(p_message);
+ 63  
+ 64  		 IF LENGTHB(p_message) > 4000 THEN
+ 65  		     large_msg := p_message;
+ 66  		 END IF;
+ 67  
+ 68  		 INSERT INTO log(
+ 69  		     task_code,
+ 70  		     log_level,
+ 71  		     message,
+ 72  		     error_code,
+ 73  		     procedure_name,
+ 74  		     error_line,
+ 75  		     note,
+ 76  		     error_backtrace,
+ 77  		     long_message,
+ 78  		     table_name)
+ 79  		   VALUES(
+ 80  		       self.task_code,
+ 81  		       'CRITICAL',
+ 82  		       msg,
+ 83  		       p_code,
+ 84  		       p_procedure_name,
+ 85  		       p_error_line,
+ 86  		       p_note,
+ 87  		       p_error_backtrace,
+ 88  		       NVL(p_long_message, large_msg),
+ 89  		       NVL(p_table_name, self.table_name)
+ 90  			  );
+ 91  		 COMMIT WORK;
+ 92  	     END IF;
+ 93  	 END critical;
+ 94  
+ 95  
+ 96  
+ 97    /** Метод вставки сообщения об ошибке
+ 98  	 * @param p_message - текст сообщения
+ 99  	 * @param p_code - код критической ошибки
+100  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+101  	 * @param p_error_line - номер строки с ошибкой
+102  	 * @param p_note - примечание
+103  	 * @param p_error_backtrace - стэк сообщения об ошибке
+104  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+105  	 */
+106  	 MEMBER PROCEDURE error(
+107  	   p_message VARCHAR2 DEFAULT NULL,
+108  	   p_code VARCHAR2 DEFAULT NULL,
+109  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+110  	   p_error_line VARCHAR2 DEFAULT NULL,
+111  	   p_note VARCHAR2 DEFAULT NULL,
+112  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+113  	   p_long_message IN CLOB DEFAULT NULL,
+114  	   p_table_name IN VARCHAR2 DEFAULT NULL
+115  	   )
+116  	 IS
+117  	     l_event_type VARCHAR2(255);
+118  	     l_table_name VARCHAR2(255);
+119  	     log_template VARCHAR2(4000);
+120  	     -- Обрезаем сообщение до первых 4К байт
+121  	     msg VARCHAR2(4000) := SUBSTRB(p_message, 1, 4000);
+122  	     l_machine varchar2(4000);
+123  	     l_event_code varchar2(4000);
+124  	     l_arm varchar2(4000);
+125  	     large_msg CLOB;
+126  
+127  	     l_sec_level varchar2(200);
+128  	     l_sec_username VARCHAR2(256);
+129  
+130  	     PRAGMA AUTONOMOUS_TRANSACTION;
+131  	 BEGIN
+132  	     IF self.level_no <= 40 THEN
+133  		 DBMS_OUTPUT.PUT_LINE(p_message);
+134  
+135  		 IF LENGTHB(p_message) > 4000 THEN
+136  		     large_msg := p_message;
+137  		 END IF;
+138  
+139  		 INSERT INTO log(
+140  		     task_code,
+141  		     log_level,
+142  		     message,
+143  		     error_code,
+144  		     procedure_name,
+145  		     error_line,
+146  		     note,
+147  		     error_backtrace,
+148  		     long_message,
+149  		     table_name)
+150  		   VALUES(
+151  		       self.task_code,
+152  		       'ERROR',
+153  		       msg,
+154  		       p_code,
+155  		       p_procedure_name,
+156  		       p_error_line,
+157  		       p_note,
+158  		       p_error_backtrace,
+159  		       NVL(p_long_message, large_msg),
+160  		       NVL(p_table_name, self.table_name)
+161  			  );
+162  		 COMMIT WORK;
+163  	     END IF;
+164  	 END error;
+165  
+166  
+167  	/* Метод вставки предупреждения
+168  	 * @param p_message - текст сообщения
+169  	 * @param p_code - код критической ошибки
+170  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+171  	 * @param p_error_line - номер строки с ошибкой
+172  	 * @param p_note - примечание
+173  	 * @param p_error_backtrace - стэк сообщения об ошибке
+174  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+175  	 */
+176  	 MEMBER PROCEDURE warning(
+177  	   p_message VARCHAR2 DEFAULT NULL,
+178  	   p_code VARCHAR2 DEFAULT NULL,
+179  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+180  	   p_error_line VARCHAR2 DEFAULT NULL,
+181  	   p_note VARCHAR2 DEFAULT NULL,
+182  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+183  	   p_long_message IN CLOB DEFAULT NULL,
+184  	   p_table_name IN VARCHAR2 DEFAULT NULL
+185  	  )
+186  	 IS
+187  	     -- Обрезаем сообщение до первых 4К байт
+188  	     msg VARCHAR2(4000) := SUBSTRB(p_message, 1, 4000);
+189  	     large_msg CLOB;
+190  	     PRAGMA AUTONOMOUS_TRANSACTION;
+191  	  BEGIN
+192  	      IF self.level_no <= 30 THEN
+193  		  DBMS_OUTPUT.PUT_LINE(p_message);
+194  
+195  		  IF LENGTHB(p_message) > 4000 THEN
+196  		      large_msg := p_message;
+197  		  END IF;
+198  
+199  		 INSERT INTO log(
+200  		     task_code,
+201  		     log_level,
+202  		     message,
+203  		     error_code,
+204  		     procedure_name,
+205  		     error_line,
+206  		     note,
+207  		     error_backtrace,
+208  		     long_message,
+209  		     table_name)
+210  		   VALUES(
+211  		       self.task_code,
+212  		       'WARNING',
+213  		       msg,
+214  		       p_code,
+215  		       p_procedure_name,
+216  		       p_error_line,
+217  		       p_note,
+218  		       p_error_backtrace,
+219  		       NVL(p_long_message, large_msg),
+220  		       NVL(p_table_name, self.table_name)
+221  			  );
+222  		 COMMIT WORK;
+223  	      END IF;
+224  	 END warning;
+225  
+226    /** Метод вставки информационного сообщения
+227  	 * @param p_message - текст сообщения
+228  	 * @param p_code - код критической ошибки
+229  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+230  	 * @param p_error_line - номер строки с ошибкой
+231  	 * @param p_note - примечание
+232  	 * @param p_error_backtrace - стэк сообщения об ошибке
+233  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+234  	 */
+235  	 MEMBER PROCEDURE info(
+236  	   p_message VARCHAR2 DEFAULT NULL,
+237  	   p_code VARCHAR2 DEFAULT NULL,
+238  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+239  	   p_error_line VARCHAR2 DEFAULT NULL,
+240  	   p_note VARCHAR2 DEFAULT NULL,
+241  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+242  	   p_long_message IN CLOB DEFAULT NULL,
+243  	   p_table_name IN VARCHAR2 DEFAULT NULL
+244  	  )
+245  	 IS
+246  	     l_table_name VARCHAR2(255);
+247  	     -- Обрезаем сообщение до первых 4К байт
+248  	     msg VARCHAR2(4000) := SUBSTRB(p_message, 1, 4000);
+249  	     l_machine varchar2(4000);
+250  	     large_msg CLOB;
+251  
+252  
+253  	     PRAGMA AUTONOMOUS_TRANSACTION;
+254  	 BEGIN
+255  	     IF self.level_no <= 20 THEN
+256  		 DBMS_OUTPUT.PUT_LINE(p_message);
+257  
+258  
+259  		 IF LENGTHB(p_message) > 4000 THEN
+260  		      large_msg := p_message;
+261  		 END IF;
+262  
+263  		 INSERT INTO log(
+264  		     task_code,
+265  		     log_level,
+266  		     message,
+267  		     error_code,
+268  		     procedure_name,
+269  		     error_line,
+270  		     note,
+271  		     error_backtrace,
+272  		     long_message,
+273  		     table_name)
+274  		   VALUES(
+275  		       self.task_code,
+276  		       'INFO',
+277  		       msg,
+278  		       p_code,
+279  		       p_procedure_name,
+280  		       p_error_line,
+281  		       p_note,
+282  		       p_error_backtrace,
+283  		       NVL(p_long_message, large_msg),
+284  		       NVL(p_table_name, self.table_name)
+285  			  )
+286  		     RETURNING ID into self.id;
+287  		 COMMIT WORK;
+288  	     END IF;
+289  	 END info;
+290  
+291  
+292  	/* Метод вставки сообщения для отладки
+293  	 * @param p_message - текст сообщения
+294  	 * @param p_code - код критической ошибки
+295  	 * @param p_procedure_name - название модуля, вызвавшего ошибку
+296  	 * @param p_error_line - номер строки с ошибкой
+297  	 * @param p_note - примечание
+298  	 * @param p_error_backtrace - стэк сообщения об ошибке
+299  	 * @param p_long_message - сообщение большого размера, превышающее 32K байт
+300  	 */
+301  	 MEMBER PROCEDURE debug(
+302  	   p_message VARCHAR2 DEFAULT NULL,
+303  	   p_code VARCHAR2 DEFAULT NULL,
+304  	   p_procedure_name  VARCHAR2 DEFAULT NULL,
+305  	   p_error_line VARCHAR2 DEFAULT NULL,
+306  	   p_note VARCHAR2 DEFAULT NULL,
+307  	   p_error_backtrace VARCHAR2 DEFAULT NULL,
+308  	   p_long_message IN CLOB DEFAULT NULL,
+309  	   p_table_name IN VARCHAR2 DEFAULT NULL
+310  	  )
+311  	 IS
+312  	     -- сообщение, обрезанное до 4К
+313  	     msg VARCHAR2(4000) := SUBSTRB(p_message, 1, 4000);
+314  	     large_msg CLOB;
+315  	     PRAGMA AUTONOMOUS_TRANSACTION;
+316  	 BEGIN
+317  	     IF self.level_no <= 10 THEN
+318  		 DBMS_OUTPUT.PUT_LINE(msg);
+319  
+320  		 IF LENGTHB(p_message) > 4000 THEN
+321  		     large_msg := p_message;
+322  		 END IF;
+323  
+324  		 INSERT INTO log(
+325  		     task_code,
+326  		     log_level,
+327  		     message,
+328  		     error_code,
+329  		     procedure_name,
+330  		     error_line,
+331  		     note,
+332  		     error_backtrace,
+333  		     long_message,
+334  		     table_name)
+335  		   VALUES(
+336  		       self.task_code,
+337  		       'DEBUG',
+338  		       msg,
+339  		       p_code,
+340  		       p_procedure_name,
+341  		       p_error_line,
+342  		       p_note,
+343  		       p_error_backtrace,
+344  		       NVL(p_long_message, large_msg),
+345  		       NVL(p_table_name, self.table_name)
+346  			  );
+347  		 COMMIT WORK;
+348  	     END IF;
+349  	 END debug;
+350  
+351  END ;
+352  
+353  
+354  SPOOL OFF
+355  
+356  .
+SQL> spool off

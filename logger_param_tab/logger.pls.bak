@@ -1,0 +1,145 @@
+create or replace TYPE LOGGER force AS OBJECT(
+
+/**
+ * Объект для журналирования действий в системе
+ * Для журналирования событий в приложении используется таблица журналов 
+ * LOG. В данную таблицу рекомендуется помещать все события 
+ * системы, логика которых реализована в базе данных, PL/SQL, Java
+ *
+ * @headcom
+ */
+
+
+    -- свойства логера
+    id NUMBER, -- идентификатор записи логгера
+    task_code VARCHAR2(30 CHAR), -- код задачи
+    log_level VARCHAR2(8), -- CRITICAL, ERROR, WARNING, INFO, DEBUG
+    level_no NUMBER, -- уровень журналирования в числовом представлении
+    table_name VARCHAR2(128), -- имя таблицы
+
+
+   /** Конструктор для инициализации логгера
+    *
+    * @param p_task_code -  код задачи
+    * @param p_table_name -  имя таблицы    
+    */
+    CONSTRUCTOR FUNCTION LOGGER(
+      SELF IN OUT NOCOPY LOGGER,
+      p_task_code IN VARCHAR2 DEFAULT NULL,
+      p_table_name IN VARCHAR2 DEFAULT NULL
+    ) RETURN SELF AS RESULT,    
+
+  /** Метод вставки критического сообщения 
+    * @param p_message - текст сообщения
+    * @param p_code - код критической ошибки
+    * @param p_procedure_name - название модуля, вызвавшего ошибку
+    * @param p_error_line - номер строки с ошибкой
+    * @param p_note - примечание
+    * @param p_error_backtrace - стэк сообщения об ошибке
+    * @param p_long_message - сообщение большого размера, превышающее 32K байт
+    * @param p_table_name -  имя таблицы     
+    */
+    MEMBER PROCEDURE critical(
+      p_message VARCHAR2 DEFAULT NULL,
+      p_code VARCHAR2 DEFAULT NULL,
+      p_procedure_name  VARCHAR2 DEFAULT NULL,
+      p_error_line VARCHAR2 DEFAULT NULL,
+      p_note VARCHAR2 DEFAULT NULL,
+      p_error_backtrace VARCHAR2 DEFAULT NULL,
+      p_long_message IN CLOB DEFAULT NULL,
+      p_table_name IN VARCHAR2 DEFAULT NULL
+     ),
+
+
+  /** Метод вставки сообщения об ошибке
+    * @param p_message - текст сообщения
+    * @param p_code - код критической ошибки
+    * @param p_procedure_name - название модуля, вызвавшего ошибку
+    * @param p_error_line - номер строки с ошибкой
+    * @param p_note - примечание
+    * @param p_error_backtrace - стэк сообщения об ошибке
+    * @param p_long_message - сообщение большого размера, превышающее 32K байт
+    * @param p_table_name -  имя таблицы     
+    */
+    MEMBER PROCEDURE error(
+      p_message VARCHAR2 DEFAULT NULL,
+      p_code VARCHAR2 DEFAULT NULL,
+      p_procedure_name  VARCHAR2 DEFAULT NULL,
+      p_error_line VARCHAR2 DEFAULT NULL,
+      p_note VARCHAR2 DEFAULT NULL,
+      p_error_backtrace VARCHAR2 DEFAULT NULL,
+      p_long_message IN CLOB DEFAULT NULL,
+      p_table_name IN VARCHAR2 DEFAULT NULL      
+      ),
+
+
+
+  /** Метод вставки предупреждения
+    * @param p_message - текст сообщения
+    * @param p_code - код критической ошибки
+    * @param p_procedure_name - название модуля, вызвавшего ошибку
+    * @param p_error_line - номер строки с ошибкой
+    * @param p_note - примечание
+    * @param p_error_backtrace - стэк сообщения об ошибке
+    * @param p_long_message - сообщение большого размера, превышающее 32K байт
+    * @param p_table_name -  имя таблицы     
+    */     
+    MEMBER PROCEDURE warning(
+      p_message VARCHAR2 DEFAULT NULL,
+      p_code VARCHAR2 DEFAULT NULL,
+      p_procedure_name  VARCHAR2 DEFAULT NULL,
+      p_error_line VARCHAR2 DEFAULT NULL,
+      p_note VARCHAR2 DEFAULT NULL,
+      p_error_backtrace VARCHAR2 DEFAULT NULL,
+      p_long_message IN CLOB DEFAULT NULL,
+      p_table_name IN VARCHAR2 DEFAULT NULL      
+     ),
+
+
+
+  /** Метод вставки информациионного сообщения
+    * @param p_message - текст сообщения
+    * @param p_code - код критической ошибки
+    * @param p_procedure_name - название модуля, вызвавшего ошибку
+    * @param p_error_line - номер строки с ошибкой
+    * @param p_note - примечание
+    * @param p_error_backtrace - стэк сообщения об ошибке
+    * @param p_long_message - сообщение большого размера, превышающее 32K байт
+    * @param p_table_name -  имя таблицы     
+    */      
+    MEMBER PROCEDURE info(
+      p_message VARCHAR2 DEFAULT NULL,
+      p_code VARCHAR2 DEFAULT NULL,
+      p_procedure_name  VARCHAR2 DEFAULT NULL,
+      p_error_line VARCHAR2 DEFAULT NULL,
+      p_note VARCHAR2 DEFAULT NULL,
+      p_error_backtrace VARCHAR2 DEFAULT NULL,
+      p_long_message IN CLOB DEFAULT NULL,
+      p_table_name IN VARCHAR2 DEFAULT NULL      
+     ),
+
+
+   /* Метод вставки сообщения для отладки
+    * @param p_message - текст сообщения
+    * @param p_code - код критической ошибки
+    * @param p_procedure_name - название модуля, вызвавшего ошибку
+    * @param p_error_line - номер строки с ошибкой
+    * @param p_note - примечание
+    * @param p_error_backtrace - стэк сообщения об ошибке
+    * @param p_long_message - сообщение большого размера, превышающее 32K байт
+    * @param p_table_name -  имя таблицы     
+    */   
+    MEMBER PROCEDURE debug(
+      p_message VARCHAR2 DEFAULT NULL,
+      p_code VARCHAR2 DEFAULT NULL,
+      p_procedure_name  VARCHAR2 DEFAULT NULL,
+      p_error_line VARCHAR2 DEFAULT NULL,
+      p_note VARCHAR2 DEFAULT NULL,
+      p_error_backtrace VARCHAR2 DEFAULT NULL,
+      p_long_message IN CLOB DEFAULT NULL,
+      p_table_name IN VARCHAR2 DEFAULT NULL      
+     )
+
+
+) NOT FINAL;
+/
